@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Baixas — Affinity Corretora</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #3D1F52;
+    --purple-light: #5a2f7a;
+    --gold: #C9913A;
+    --gold-light: #e0a94a;
+    --bg: #f5f3f8;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b6b8a;
+    --border: #e2dcea;
+    --sim: #2d8a55;
+    --nao: #c0392b;
+    --sim-bg: #eaf7ef;
+    --nao-bg: #fdf0ef;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--purple);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  }
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+  .logo-icon {
+    width: 42px; height: 42px;
+    background: var(--gold);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900; color: var(--purple);
+  }
+  .logo-text { color: #fff; }
+  .logo-text h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.3px; }
+  .logo-text p { font-size: 12px; color: #c8b8e0; margin-top: 1px; }
+  .header-date { color: #c8b8e0; font-size: 13px; text-align: right; }
+
+  /* UPLOAD ZONE */
+  .upload-section {
+    max-width: 1200px;
+    margin: 28px auto 0;
+    padding: 0 24px;
+  }
+  .upload-box {
+    border: 2.5px dashed var(--gold);
+    border-radius: 14px;
+    background: #fff;
+    padding: 36px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .upload-box:hover { background: #fdf8f0; border-color: var(--purple); }
+  .upload-box input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .upload-icon { font-size: 36px; margin-bottom: 10px; }
+  .upload-box h3 { color: var(--purple); font-size: 16px; margin-bottom: 6px; }
+  .upload-box p { color: var(--muted); font-size: 13px; }
+  .upload-box.has-file { border-color: var(--sim); background: #f0faf4; }
+  .upload-box.has-file h3 { color: var(--sim); }
+
+  /* DASHBOARD */
+  .dashboard { max-width: 1200px; margin: 24px auto 40px; padding: 0 24px; display: none; }
+
+  /* TOP ACTIONS */
+  .top-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .semana-info { color: var(--muted); font-size: 13px; }
+  .semana-info strong { color: var(--purple); font-size: 15px; }
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.18s;
+  }
+  .btn-pdf { background: var(--purple); color: #fff; }
+  .btn-pdf:hover { background: var(--purple-light); }
+  .btn-excel { background: var(--gold); color: #fff; }
+  .btn-excel:hover { background: var(--gold-light); }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(61,31,82,0.06);
+  }
+  .kpi-card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .kpi-card .value { font-size: 26px; font-weight: 700; color: var(--purple); line-height: 1; }
+  .kpi-card .sub { font-size: 12px; color: var(--muted); margin-top: 5px; }
+  .kpi-card.gold .value { color: var(--gold); }
+  .kpi-card.sim .value { color: var(--sim); }
+  .kpi-card.nao .value { color: var(--nao); }
+
+  /* VITALITY ROW */
+  .vitalicio-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .vitalicio-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(61,31,82,0.06);
+  }
+  .vitalicio-card.sim-card { border-left: 4px solid var(--sim); }
+  .vitalicio-card.nao-card { border-left: 4px solid var(--nao); }
+  .vitalicio-card h3 { font-size: 13px; color: var(--muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .vit-stats { display: flex; gap: 28px; align-items: flex-end; }
+  .vit-num { font-size: 32px; font-weight: 700; }
+  .vit-detail { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .sim-card .vit-num { color: var(--sim); }
+  .nao-card .vit-num { color: var(--nao); }
+
+  /* PROGRESS BAR */
+  .prog-bar-wrap { margin: 16px 0 8px; }
+  .prog-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  .prog-bar { height: 8px; background: #f0eaf8; border-radius: 99px; overflow: hidden; }
+  .prog-fill-sim { height: 100%; background: var(--sim); border-radius: 99px; transition: width 0.7s ease; }
+  .prog-fill-nao { height: 100%; background: var(--nao); border-radius: 99px; transition: width 0.7s ease; }
+
+  /* OPERADORA SECTION */
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 18px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  .operadora-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .op-card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 6px rgba(61,31,82,0.05);
+  }
+  .op-name { font-size: 13px; font-weight: 700; color: var(--purple); margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .op-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .op-label { font-size: 12px; color: var(--muted); }
+  .op-val { font-size: 13px; font-weight: 600; color: var(--text); }
+  .op-val.total { color: var(--purple); font-size: 15px; font-weight: 700; }
+  .op-bar { height: 4px; border-radius: 99px; background: #f0eaf8; margin-top: 10px; overflow: hidden; }
+  .op-bar-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--gold)); border-radius: 99px; }
+  .op-tags { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+  .tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 99px;
+    letter-spacing: 0.3px;
+  }
+  .tag-sim { background: var(--sim-bg); color: var(--sim); }
+  .tag-nao { background: var(--nao-bg); color: var(--nao); }
+
+  /* TABELA */
+  .table-section {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(61,31,82,0.06);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .table-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .filter-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .filter-select, .filter-input {
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+  }
+  .filter-select:focus, .filter-input:focus { border-color: var(--purple); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead { background: var(--purple); color: #fff; }
+  thead th { padding: 11px 14px; text-align: left; font-weight: 600; font-size: 12px; letter-spacing: 0.3px; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid #f3eff8; }
+  tbody tr:hover { background: #faf8fd; }
+  tbody td { padding: 10px 14px; color: var(--text); }
+  td.vit-sim { color: var(--sim); font-weight: 700; }
+  td.vit-nao { color: var(--nao); font-weight: 600; }
+  td.valor { font-weight: 600; color: var(--purple); font-size: 13px; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge-sim { background: var(--sim-bg); color: var(--sim); }
+  .badge-nao { background: var(--nao-bg); color: var(--nao); }
+
+  .pagination {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .page-btns { display: flex; gap: 6px; }
+  .page-btn {
+    padding: 5px 11px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .page-btn.active { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .page-btn:hover:not(.active) { background: var(--bg); }
+
+  /* SPINNER */
+  .spinner {
+    display: none;
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .spin {
+    display: inline-block;
+    width: 28px; height: 28px;
+    border: 3px solid var(--border);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-bottom: 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 680px) {
+    header { padding: 14px 16px; }
+    .upload-section, .dashboard { padding: 0 12px; }
+    .vitalicio-row { grid-template-columns: 1fr; }
+    .vit-stats { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">
+      <h1>Affinity Corretora</h1>
+      <p>Dashboard · Baixas de Comissão</p>
+    </div>
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<!-- UPLOAD -->
+<div class="upload-section">
+  <div class="upload-box" id="uploadBox">
+    <input type="file" id="fileInput" accept=".xml,.xlsx,.xls,.csv">
+    <div class="upload-icon">📂</div>
+    <h3 id="uploadTitle">Selecione o arquivo da semana</h3>
+    <p id="uploadSub">Arraste ou clique para carregar o XML de baixas · Aceita .xml, .xlsx, .csv</p>
+  </div>
+  <div class="spinner" id="spinner">
+    <div class="spin"></div><br>Processando arquivo...
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+
+  <div class="top-actions">
+    <div class="semana-info">
+      Semana de baixas: <strong id="dataSemana">—</strong> &nbsp;·&nbsp; <span id="totalRegistros"></span>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-pdf" onclick="exportarPDF()">⬇ Exportar PDF</button>
+      <button class="btn btn-excel" onclick="exportarExcel()">⬇ Exportar Excel</button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- VITALICIO -->
+  <div class="section-title">Vitalício vs. Não Vitalício</div>
+  <div class="vitalicio-row">
+    <div class="vitalicio-card sim-card">
+      <h3>✅ Vitalício</h3>
+      <div class="vit-stats">
+        <div class="vit-num" id="vitSimQtd">0</div>
+        <div class="vit-detail">
+          registros<br>
+          <strong id="vitSimVal">R$ 0,00</strong><br>
+          <span style="font-size:12px">do valor total</span>
+        </div>
+      </div>
+      <div class="prog-bar-wrap">
+        <div class="prog-bar-label"><span>% do total</span><span id="vitSimPct">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill-sim" id="vitSimBar" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="vitalicio-card nao-card">
+      <h3>❌ Não Vitalício</h3>
+      <div class="vit-stats">
+        <div class="vit-num" id="vitNaoQtd">0</div>
+        <div class="vit-detail">
+          registros<br>
+          <strong id="vitNaoVal">R$ 0,00</strong><br>
+          <span style="font-size:12px">do valor total</span>
+        </div>
+      </div>
+      <div class="prog-bar-wrap">
+        <div class="prog-bar-label"><span>% do total</span><span id="vitNaoPct">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill-nao" id="vitNaoBar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPERADORAS -->
+  <div class="section-title">Por Operadora</div>
+  <div class="operadora-grid" id="operadoraGrid"></div>
+
+  <!-- TABELA DETALHE -->
+  <div class="table-section">
+    <div class="table-header">
+      <div class="section-title" style="margin:0">Detalhamento dos Registros</div>
+      <div class="filter-row">
+        <input class="filter-input" type="text" id="searchInput" placeholder="Buscar operadora ou grade..." oninput="filtrarTabela()">
+        <select class="filter-select" id="filtroVitalicio" onchange="filtrarTabela()">
+          <option value="">Todos</option>
+          <option value="Sim">Vitalício</option>
+          <option value="Não">Não Vitalício</option>
+        </select>
+        <select class="filter-select" id="filtroOperadora" onchange="filtrarTabela()">
+          <option value="">Todas as operadoras</option>
+        </select>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table id="tabelaDados">
+        <thead>
+          <tr>
+            <th>Data Baixa</th>
+            <th>Assinatura</th>
+            <th>Grade Corretor</th>
+            <th>Parcela</th>
+            <th>Operadora</th>
+            <th>Vl Total</th>
+            <th>Vitalício</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaBody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span id="paginacaoInfo"></span>
+      <div class="page-btns" id="paginacaoBtns"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let allRows = [];
+let filteredRows = [];
+let currentPage = 1;
+const PAGE_SIZE = 50;
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('headerDate').textContent =
+    now.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  setupUpload();
+});
+
+function setupUpload() {
+  const input = document.getElementById('fileInput');
+  const box = document.getElementById('uploadBox');
+
+  input.addEventListener('change', e => {
+    if (e.target.files[0]) processFile(e.target.files[0]);
+  });
+  box.addEventListener('dragover', e => { e.preventDefault(); box.style.background='#fdf8f0'; });
+  box.addEventListener('dragleave', () => { box.style.background=''; });
+  box.addEventListener('drop', e => {
+    e.preventDefault();
+    box.style.background='';
+    if (e.dataTransfer.files[0]) {
+      document.getElementById('fileInput').files = e.dataTransfer.files;
+      processFile(e.dataTransfer.files[0]);
+    }
+  });
+}
+
+// ─── PROCESS FILE ─────────────────────────────────────────────────────────────
+function processFile(file) {
+  document.getElementById('spinner').style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      let rows = [];
+      const name = file.name.toLowerCase();
+
+      if (name.endsWith('.xml')) {
+        rows = parseXML(e.target.result);
+      } else if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+        const wb = XLSX.read(e.target.result, {type:'binary'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(ws);
+      } else if (name.endsWith('.csv')) {
+        const wb = XLSX.read(e.target.result, {type:'binary'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(ws);
+      }
+
+      if (rows.length === 0) throw new Error('Nenhum dado encontrado');
+
+      allRows = rows;
+      filteredRows = [...allRows];
+
+      // UI feedback
+      const box = document.getElementById('uploadBox');
+      box.classList.add('has-file');
+      document.getElementById('uploadTitle').textContent = `✓ ${file.name}`;
+      document.getElementById('uploadSub').textContent = `${rows.length.toLocaleString('pt-BR')} registros carregados · Clique para trocar o arquivo`;
+
+      buildDashboard();
+
+    } catch(err) {
+      alert('Erro ao processar arquivo: ' + err.message);
+      console.error(err);
+    }
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+  };
+
+  if (file.name.toLowerCase().endsWith('.xml')) reader.readAsText(file, 'utf-8');
+  else reader.readAsBinaryString(file);
+}
+
+// ─── XML PARSER ───────────────────────────────────────────────────────────────
+function parseXML(xmlStr) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlStr, 'text/xml');
+  const ns = 'urn:schemas-microsoft-com:office:spreadsheet';
+  const rows = Array.from(doc.getElementsByTagNameNS(ns, 'Row'));
+
+  const headers = [];
+  const result = [];
+
+  rows.forEach((row, ri) => {
+    const cells = Array.from(row.getElementsByTagNameNS(ns, 'Cell'));
+    const values = [];
+
+    let lastIdx = 0;
+    cells.forEach(cell => {
+      const idxAttr = cell.getAttribute('ss:Index');
+      const idx = idxAttr ? parseInt(idxAttr) - 1 : lastIdx;
+      while (values.length < idx) values.push('');
+      const dataEl = cell.getElementsByTagNameNS(ns, 'Data')[0];
+      const type = dataEl ? dataEl.getAttribute('ss:Type') : '';
+      let val = dataEl ? dataEl.textContent.trim() : '';
+
+      if (type === 'DateTime') {
+        const d = new Date(val);
+        if (!isNaN(d)) val = d.toLocaleDateString('pt-BR');
+      } else if (type === 'Number') {
+        val = parseFloat(val);
+      }
+
+      values.push(val);
+      lastIdx = values.length;
+    });
+
+    if (ri === 0) {
+      values.forEach(v => headers.push(String(v).trim()));
+    } else if (values.length >= 6 && typeof values[5] === 'number' && values[4]) {
+      const obj = {};
+      headers.forEach((h, i) => { if (h) obj[h] = values[i] ?? ''; });
+      result.push(obj);
+    }
+  });
+
+  return result;
+}
+
+// ─── FORMAT ───────────────────────────────────────────────────────────────────
+function fmt(n) {
+  return Number(n || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+}
+
+// ─── BUILD DASHBOARD ──────────────────────────────────────────────────────────
+function buildDashboard() {
+  const rows = allRows;
+
+  // KPIs
+  const total = rows.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+  const qtd = rows.length;
+  const vitSim = rows.filter(r => String(r['Vitalício']).toLowerCase() === 'sim');
+  const vitNao = rows.filter(r => String(r['Vitalício']).toLowerCase() !== 'sim');
+  const operadoras = [...new Set(rows.map(r => r['Operadora']).filter(Boolean))];
+  const dataBaixa = rows[0]?.['Baixa'] || '—';
+
+  document.getElementById('dataSemana').textContent = dataBaixa;
+  document.getElementById('totalRegistros').textContent = `${qtd.toLocaleString('pt-BR')} registros`;
+
+  // KPI cards
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card gold">
+      <div class="label">Valor Total Baixado</div>
+      <div class="value">${fmt(total)}</div>
+      <div class="sub">${qtd.toLocaleString('pt-BR')} registros</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Operadoras</div>
+      <div class="value">${operadoras.length}</div>
+      <div class="sub">distintas na semana</div>
+    </div>
+    <div class="kpi-card sim">
+      <div class="label">Vitalício — Qtd</div>
+      <div class="value">${vitSim.length.toLocaleString('pt-BR')}</div>
+      <div class="sub">${fmt(vitSim.reduce((s,r)=>s+(parseFloat(r['Vl Total'])||0),0))}</div>
+    </div>
+    <div class="kpi-card nao">
+      <div class="label">Não Vitalício — Qtd</div>
+      <div class="value">${vitNao.length.toLocaleString('pt-BR')}</div>
+      <div class="sub">${fmt(vitNao.reduce((s,r)=>s+(parseFloat(r['Vl Total'])||0),0))}</div>
+    </div>
+  `;
+
+  // Vitalício blocks
+  const simVal = vitSim.reduce((s,r)=>s+(parseFloat(r['Vl Total'])||0),0);
+  const naoVal = vitNao.reduce((s,r)=>s+(parseFloat(r['Vl Total'])||0),0);
+  const simPct = total > 0 ? Math.round(simVal/total*100) : 0;
+  const naoPct = 100 - simPct;
+
+  document.getElementById('vitSimQtd').textContent = vitSim.length.toLocaleString('pt-BR');
+  document.getElementById('vitSimVal').textContent = fmt(simVal);
+  document.getElementById('vitSimPct').textContent = simPct + '%';
+  document.getElementById('vitNaoQtd').textContent = vitNao.length.toLocaleString('pt-BR');
+  document.getElementById('vitNaoVal').textContent = fmt(naoVal);
+  document.getElementById('vitNaoPct').textContent = naoPct + '%';
+  setTimeout(()=>{
+    document.getElementById('vitSimBar').style.width = simPct+'%';
+    document.getElementById('vitNaoBar').style.width = naoPct+'%';
+  }, 100);
+
+  // Operadoras cards
+  const opMap = {};
+  rows.forEach(r => {
+    const op = r['Operadora'] || 'Sem operadora';
+    if (!opMap[op]) opMap[op] = { total:0, sim:0, nao:0, qtd:0 };
+    opMap[op].total += parseFloat(r['Vl Total']) || 0;
+    opMap[op].qtd++;
+    if (String(r['Vitalício']).toLowerCase() === 'sim') opMap[op].sim++;
+    else opMap[op].nao++;
+  });
+  const maxTotal = Math.max(...Object.values(opMap).map(o=>o.total));
+  const sorted = Object.entries(opMap).sort((a,b)=>b[1].total-a[1].total);
+
+  document.getElementById('operadoraGrid').innerHTML = sorted.map(([op, o]) => `
+    <div class="op-card">
+      <div class="op-name" title="${op}">${op}</div>
+      <div class="op-row"><span class="op-label">Valor total</span><span class="op-val total">${fmt(o.total)}</span></div>
+      <div class="op-row"><span class="op-label">Registros</span><span class="op-val">${o.qtd.toLocaleString('pt-BR')}</span></div>
+      <div class="op-bar"><div class="op-bar-fill" style="width:${Math.round(o.total/maxTotal*100)}%"></div></div>
+      <div class="op-tags">
+        ${o.sim ? `<span class="tag tag-sim">✅ ${o.sim} Vitalício</span>` : ''}
+        ${o.nao ? `<span class="tag tag-nao">❌ ${o.nao} Não Vitalício</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  // Populate operadora filter
+  const sel = document.getElementById('filtroOperadora');
+  sel.innerHTML = '<option value="">Todas as operadoras</option>';
+  sorted.forEach(([op]) => {
+    const opt = document.createElement('option');
+    opt.value = op; opt.textContent = op;
+    sel.appendChild(opt);
+  });
+
+  filteredRows = [...allRows];
+  currentPage = 1;
+  renderTabela();
+}
+
+// ─── TABELA ───────────────────────────────────────────────────────────────────
+function filtrarTabela() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const vit = document.getElementById('filtroVitalicio').value;
+  const op = document.getElementById('filtroOperadora').value;
+
+  filteredRows = allRows.filter(r => {
+    const matchSearch = !search ||
+      String(r['Operadora']||'').toLowerCase().includes(search) ||
+      String(r['Grade Corretor']||'').toLowerCase().includes(search);
+    const matchVit = !vit || String(r['Vitalício']) === vit;
+    const matchOp = !op || r['Operadora'] === op;
+    return matchSearch && matchVit && matchOp;
+  });
+
+  currentPage = 1;
+  renderTabela();
+}
+
+function renderTabela() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
+  const pageRows = filteredRows.slice(start, end);
+
+  document.getElementById('tabelaBody').innerHTML = pageRows.map(r => {
+    const vit = String(r['Vitalício'] || '');
+    const isSim = vit.toLowerCase() === 'sim';
+    return `
+      <tr>
+        <td>${r['Baixa'] || '—'}</td>
+        <td>${r['Assinatura'] || '—'}</td>
+        <td>${r['Grade Corretor'] || '—'}</td>
+        <td style="text-align:center">${r['Parcela'] ?? '—'}</td>
+        <td>${r['Operadora'] || '—'}</td>
+        <td class="valor">${fmt(r['Vl Total'])}</td>
+        <td><span class="badge ${isSim?'badge-sim':'badge-nao'}">${vit || '—'}</span></td>
+      </tr>`;
+  }).join('');
+
+  const total = filteredRows.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+  document.getElementById('paginacaoInfo').textContent =
+    `Mostrando ${Math.min(start+1, total)}–${Math.min(end, total)} de ${total.toLocaleString('pt-BR')} registros`;
+
+  const container = document.getElementById('paginacaoBtns');
+  container.innerHTML = '';
+  const range = buildPageRange(currentPage, pages);
+  range.forEach(p => {
+    if (p === '...') {
+      const s = document.createElement('span');
+      s.textContent = '…'; s.style.padding = '5px 4px'; s.style.color = 'var(--muted)';
+      container.appendChild(s);
+    } else {
+      const btn = document.createElement('button');
+      btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+      btn.textContent = p;
+      btn.onclick = () => { currentPage = p; renderTabela(); };
+      container.appendChild(btn);
+    }
+  });
+}
+
+function buildPageRange(cur, total) {
+  if (total <= 7) return Array.from({length:total},(_,i)=>i+1);
+  const pages = [];
+  if (cur <= 4) {
+    for(let i=1;i<=5;i++) pages.push(i);
+    pages.push('...'); pages.push(total);
+  } else if (cur >= total-3) {
+    pages.push(1); pages.push('...');
+    for(let i=total-4;i<=total;i++) pages.push(i);
+  } else {
+    pages.push(1); pages.push('...');
+    for(let i=cur-1;i<=cur+1;i++) pages.push(i);
+    pages.push('...'); pages.push(total);
+  }
+  return pages;
+}
+
+// ─── HELPER: RESUMO POR OPERADORA ────────────────────────────────────────────
+function buildResumo() {
+  const opMap = {};
+  allRows.forEach(r => {
+    const op = r['Operadora'] || 'Sem operadora';
+    if (!opMap[op]) opMap[op] = { total: 0, sim: 0, nao: 0, qtd: 0 };
+    opMap[op].total += parseFloat(r['Vl Total']) || 0;
+    opMap[op].qtd++;
+    if (String(r['Vitalício']).toLowerCase() === 'sim') opMap[op].sim++;
+    else opMap[op].nao++;
+  });
+  return Object.entries(opMap).sort((a, b) => a[0].localeCompare(b[0], "pt-BR"));
+}
+
+// ─── EXPORT EXCEL ─────────────────────────────────────────────────────────────
+function exportarExcel() {
+  const dataBaixa = allRows[0]?.['Baixa'] || '—';
+  const total = allRows.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+  const vitSim = allRows.filter(r => String(r['Vitalício']).toLowerCase() === 'sim');
+  const vitNao = allRows.filter(r => String(r['Vitalício']).toLowerCase() !== 'sim');
+  const simVal = vitSim.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+  const naoVal = vitNao.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+
+  const resumo = buildResumo().map(([op, o]) => ({
+    'Operadora': op,
+    'Valor Total (R$)': parseFloat(o.total.toFixed(2))
+  }));
+
+  // Linha de totais
+  resumo.push({
+    'Operadora': 'TOTAL GERAL',
+    'Valor Total (R$)': parseFloat(total.toFixed(2))
+  });
+
+  const wb = XLSX.utils.book_new();
+
+  // Cabeçalho com info da semana
+  const cabecalho = [
+    ['Affinity Corretora — Resumo de Baixas de Comissão'],
+    [`Semana: ${dataBaixa}   |   Gerado em: ${new Date().toLocaleDateString('pt-BR')}`],
+    [`Total baixado: ${fmt(total)}`],
+    []
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(cabecalho);
+  XLSX.utils.sheet_add_json(ws, resumo, { origin: 'A5' });
+  ws['!cols'] = [{ wch: 38 }, { wch: 22 }];
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Resumo por Operadora');
+
+  const dataNome = dataBaixa.replace(/\//g, '-');
+  XLSX.writeFile(wb, `Resumo_Baixas_${dataNome}.xlsx`);
+}
+
+// ─── EXPORT PDF ───────────────────────────────────────────────────────────────
+function exportarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const purple = [61, 31, 82];
+  const gold = [201, 145, 58];
+  const simColor = [45, 138, 85];
+  const naoColor = [192, 57, 43];
+  const W = doc.internal.pageSize.getWidth();
+
+  const dataBaixa = allRows[0]?.['Baixa'] || '—';
+  const total = allRows.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+  const vitSim = allRows.filter(r => String(r['Vitalício']).toLowerCase() === 'sim');
+  const vitNao = allRows.filter(r => String(r['Vitalício']).toLowerCase() !== 'sim');
+  const simVal = vitSim.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+  const naoVal = vitNao.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+
+  // ── Header bar
+  doc.setFillColor(...purple);
+  doc.rect(0, 0, W, 24, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Affinity Corretora', 12, 11);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Resumo de Baixas de Comissão', 12, 18);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Semana: ${dataBaixa}   ·   ${new Date().toLocaleDateString('pt-BR')}`, W - 12, 15, { align: 'right' });
+
+  // ── KPI boxes
+  const kpiY = 30;
+  const kpiH = 18;
+  const kpiW = (W - 24 - 6) / 3;
+  const kpis = [
+    { label: 'Total Baixado', val: fmt(total), color: purple },
+    { label: `Vitalício (${vitSim.length} reg.)`, val: fmt(simVal), color: simColor },
+    { label: `Não Vitalício (${vitNao.length} reg.)`, val: fmt(naoVal), color: naoColor }
+  ];
+  kpis.forEach((k, i) => {
+    const x = 12 + i * (kpiW + 3);
+    doc.setFillColor(248, 245, 252);
+    doc.roundedRect(x, kpiY, kpiW, kpiH, 2, 2, 'F');
+    doc.setDrawColor(...k.color);
+    doc.setLineWidth(0.7);
+    doc.line(x, kpiY, x, kpiY + kpiH);
+    doc.setTextColor(100, 80, 120);
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(k.label, x + 4, kpiY + 6);
+    doc.setTextColor(...k.color);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text(k.val, x + 4, kpiY + 14);
+  });
+
+  // ── Gold divider
+  doc.setDrawColor(...gold);
+  doc.setLineWidth(0.5);
+  doc.line(12, kpiY + kpiH + 5, W - 12, kpiY + kpiH + 5);
+
+  // ── Section title
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...purple);
+  doc.text('Resumo por Operadora', 12, kpiY + kpiH + 12);
+
+  // ── Table
+  const resumo = buildResumo();
+  const tableRows = resumo.map(([op, o]) => [
+    op,
+    fmt(o.total)
+  ]);
+
+  // Linha de total
+  tableRows.push(['TOTAL GERAL', fmt(total)]);
+
+  doc.autoTable({
+    head: [['Operadora', 'Valor Total']],
+    body: tableRows,
+    startY: kpiY + kpiH + 15,
+    styles: { fontSize: 9, cellPadding: 3.5, textColor: [40, 30, 55] },
+    headStyles: { fillColor: purple, textColor: 255, fontStyle: 'bold', fontSize: 9 },
+    alternateRowStyles: { fillColor: [248, 245, 252] },
+    columnStyles: {
+      0: { cellWidth: 'auto' },
+      1: { cellWidth: 50, halign: 'right', fontStyle: 'bold' }
+    },
+    didParseCell: data => {
+      if (data.row.index === tableRows.length - 1 && data.section === 'body') {
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.styles.fillColor = [235, 228, 245];
+        data.cell.styles.textColor = purple;
+      }
+    },
+    margin: { left: 12, right: 12 }
+  });
+
+  // ── Rodapé
+  const pageH = doc.internal.pageSize.getHeight();
+  doc.setFontSize(7);
+  doc.setTextColor(160, 140, 180);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Affinity Corretora de Seguros · Documento gerado automaticamente', W / 2, pageH - 8, { align: 'center' });
+
+  const dataNome = dataBaixa.replace(/\//g, '-');
+  doc.save(`Resumo_Baixas_${dataNome}.pdf`);
+}
+</script>
+</body>
+</html>
