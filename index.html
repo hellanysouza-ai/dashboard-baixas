@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard de Baixas — Affinity Corretora</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <style>
@@ -759,42 +760,157 @@ function buildResumo() {
 }
 
 // ─── EXPORT EXCEL ─────────────────────────────────────────────────────────────
-function exportarExcel() {
+async function exportarExcel() {
   const dataBaixa = allRows[0]?.['Baixa'] || '—';
   const total = allRows.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
   const vitSim = allRows.filter(r => String(r['Vitalício']).toLowerCase() === 'sim');
   const vitNao = allRows.filter(r => String(r['Vitalício']).toLowerCase() !== 'sim');
   const simVal = vitSim.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
   const naoVal = vitNao.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+  const resumo = buildResumo();
 
-  const resumo = buildResumo().map(([op, o]) => ({
-    'Operadora': op,
-    'Valor Total (R$)': parseFloat(o.total.toFixed(2))
-  }));
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Affinity Corretora';
+  wb.created = new Date();
 
-  // Linha de totais
-  resumo.push({
-    'Operadora': 'TOTAL GERAL',
-    'Valor Total (R$)': parseFloat(total.toFixed(2))
+  const ws = wb.addWorksheet('Resumo por Operadora', {
+    views: [{ showGridLines: false }],
+    pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true }
   });
 
-  const wb = XLSX.utils.book_new();
+  // ── Paleta Affinity
+  const PURPLE     = '7B3A6E';  // roxo principal
+  const PURPLE_DK  = '5C2952';  // roxo escuro
+  const GOLD       = 'C9A84C';  // dourado
+  const GOLD_LIGHT = 'F5EDD8';  // dourado claro (fundo suave)
+  const WHITE      = 'FFFFFF';
+  const LIGHT_BG   = 'FBF7FF';  // lilás bem claro
+  const ALT_ROW    = 'F0E8F5';  // alternância roxo suave
+  const TEXT_DARK  = '2B1A38';  // texto escuro
+  const SIM_GREEN  = '2D8A55';
+  const NAO_RED    = 'C0392B';
 
-  // Cabeçalho com info da semana
-  const cabecalho = [
-    ['Affinity Corretora — Resumo de Baixas de Comissão'],
-    [`Semana: ${dataBaixa}   |   Gerado em: ${new Date().toLocaleDateString('pt-BR')}`],
-    [`Total baixado: ${fmt(total)}`],
-    []
+  // Largura das colunas
+  ws.columns = [
+    { key: 'op',  width: 44 },
+    { key: 'val', width: 26 }
   ];
-  const ws = XLSX.utils.aoa_to_sheet(cabecalho);
-  XLSX.utils.sheet_add_json(ws, resumo, { origin: 'A5' });
-  ws['!cols'] = [{ wch: 38 }, { wch: 22 }];
 
-  XLSX.utils.book_append_sheet(wb, ws, 'Resumo por Operadora');
+  // helper de fonte padrão
+  const F = (extra = {}) => ({ name: 'Arial', size: 12, ...extra });
 
+  // ── LINHA 1: Título — fundo roxo escuro
+  ws.mergeCells('A1:B1');
+  const t = ws.getCell('A1');
+  t.value = 'Affinity Corretora — Resumo de Baixas de Comissão';
+  t.font = F({ size: 14, bold: true, color: { argb: WHITE } });
+  t.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE_DK } };
+  t.alignment = { vertical: 'middle', horizontal: 'center' };
+  ws.getRow(1).height = 38;
+
+  // ── LINHA 2: Semana / data — fundo dourado claro
+  ws.mergeCells('A2:B2');
+  const s = ws.getCell('A2');
+  s.value = `Semana de baixas: ${dataBaixa}   ·   Gerado em: ${new Date().toLocaleDateString('pt-BR')}`;
+  s.font = F({ size: 11, italic: true, color: { argb: PURPLE_DK } });
+  s.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GOLD_LIGHT } };
+  s.alignment = { vertical: 'middle', horizontal: 'center' };
+  ws.getRow(2).height = 24;
+
+  // ── LINHA 3: espaço
+  ws.getRow(3).height = 6;
+
+  // ── LINHAS 4-6: KPIs
+  const kpis = [
+    { label: 'VALOR TOTAL BAIXADO', val: fmt(total),  color: GOLD,      bg: GOLD_LIGHT },
+    { label: `VITALÍCIO — ${vitSim.length} registros`, val: fmt(simVal), color: SIM_GREEN, bg: 'EAF7EF' },
+    { label: `NÃO VITALÍCIO — ${vitNao.length} registros`, val: fmt(naoVal), color: NAO_RED, bg: 'FDF0EF' },
+  ];
+
+  kpis.forEach((k, i) => {
+    const r = 4 + i;
+    ws.getRow(r).height = 28;
+
+    const cA = ws.getCell(`A${r}`);
+    cA.value = k.label;
+    cA.font = F({ bold: true, color: { argb: TEXT_DARK } });
+    cA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: k.bg } };
+    cA.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+    cA.border = {};
+
+    const cB = ws.getCell(`B${r}`);
+    cB.value = k.val;
+    cB.font = F({ bold: true, color: { argb: k.color } });
+    cB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: k.bg } };
+    cB.alignment = { vertical: 'middle', horizontal: 'right' };
+  });
+
+  // ── LINHA 7: espaço
+  ws.getRow(7).height = 8;
+
+  // ── LINHA 8: cabeçalho da tabela
+  ws.getRow(8).height = 24;
+  ['Operadora', 'Valor Total'].forEach((h, i) => {
+    const col = String.fromCharCode(65 + i);
+    const cell = ws.getCell(`${col}8`);
+    cell.value = h;
+    cell.font = F({ bold: true, color: { argb: WHITE } });
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE } };
+    cell.alignment = { vertical: 'middle', horizontal: i === 0 ? 'left' : 'right', indent: i === 0 ? 1 : 0 };
+    cell.border = { bottom: { style: 'medium', color: { argb: GOLD } } };
+  });
+
+  // ── LINHAS DE DADOS
+  resumo.forEach(([op, o], idx) => {
+    const rowNum = 9 + idx;
+    ws.getRow(rowNum).height = 22;
+    const bg = idx % 2 === 1 ? ALT_ROW : WHITE;
+
+    const cA = ws.getCell(`A${rowNum}`);
+    cA.value = op;
+    cA.font = F({ color: { argb: TEXT_DARK } });
+    cA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+    cA.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+    cA.border = {};
+
+    const cB = ws.getCell(`B${rowNum}`);
+    cB.value = o.total;
+    cB.numFmt = 'R$ #,##0.00';
+    cB.font = F({ bold: true, color: { argb: PURPLE } });
+    cB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+    cB.alignment = { vertical: 'middle', horizontal: 'right' };
+    cB.border = {};
+  });
+
+  // ── LINHA TOTAL GERAL
+  const totalRow = 9 + resumo.length;
+  ws.getRow(totalRow).height = 26;
+
+  const tcA = ws.getCell(`A${totalRow}`);
+  tcA.value = 'TOTAL GERAL';
+  tcA.font = F({ bold: true, color: { argb: GOLD_LIGHT } });
+  tcA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE_DK } };
+  tcA.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+  tcA.border = { top: { style: 'medium', color: { argb: GOLD } } };
+
+  const tcB = ws.getCell(`B${totalRow}`);
+  tcB.value = total;
+  tcB.numFmt = 'R$ #,##0.00';
+  tcB.font = F({ bold: true, color: { argb: GOLD } });
+  tcB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE_DK } };
+  tcB.alignment = { vertical: 'middle', horizontal: 'right' };
+  tcB.border = { top: { style: 'medium', color: { argb: GOLD } } };
+
+  // ── Gerar e baixar
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
   const dataNome = dataBaixa.replace(/\//g, '-');
-  XLSX.writeFile(wb, `Resumo_Baixas_${dataNome}.xlsx`);
+  a.download = `Resumo_Baixas_${dataNome}.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ─── EXPORT PDF ───────────────────────────────────────────────────────────────
