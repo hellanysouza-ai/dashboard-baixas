@@ -308,6 +308,246 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+
+  /* TABS */
+  .tabs-nav {
+    max-width: 1200px;
+    margin: 20px auto 0;
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+  }
+  .tab-btn {
+    padding: 10px 22px;
+    border-radius: 10px 10px 0 0;
+    border: 1.5px solid var(--border);
+    border-bottom: none;
+    background: #ede8f5;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .tab-btn.active {
+    background: #fff;
+    color: var(--purple);
+    border-color: var(--border);
+  }
+  .tab-btn:hover:not(.active) { background: #e0d8f0; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* APURAÇÃO */
+  .apuracao-section {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 0 24px;
+  }
+  .apuracao-notice {
+    background: #fffbf0;
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #7a5a00;
+    margin-bottom: 20px;
+  }
+  .corretor-form {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(61,31,82,0.06);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .corretor-form h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+  .form-group input, .form-group textarea {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--purple); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group small { font-size: 11px; color: var(--muted); }
+  .btn-add-corretor {
+    background: var(--purple);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .btn-add-corretor:hover { background: var(--purple-light); }
+
+  /* LISTA DE CORRETORES CADASTRADOS */
+  .corretores-lista {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(61,31,82,0.06);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .corretores-lista-header {
+    padding: 14px 20px;
+    background: var(--purple);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .corretor-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .corretor-item:last-child { border-bottom: none; }
+  .corretor-info { flex: 1; }
+  .corretor-nome { font-size: 14px; font-weight: 700; color: var(--purple); margin-bottom: 4px; }
+  .corretor-rules { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .corretor-rules span { background: #f0eaf8; color: var(--purple); padding: 1px 7px; border-radius: 99px; font-size: 11px; font-weight: 600; margin-right: 4px; }
+  .btn-del-corretor {
+    background: #fdf0ef;
+    color: var(--nao);
+    border: 1px solid #f5c6c1;
+    border-radius: 7px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-del-corretor:hover { background: #f9dbd8; }
+
+  /* RESULTADOS APURAÇÃO */
+  .apuracao-resultado {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(61,31,82,0.06);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .apuracao-resultado-header {
+    padding: 14px 20px;
+    background: linear-gradient(90deg, var(--purple), #7B3A6E);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .corretor-result-block {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+  .corretor-result-block:last-child { border-bottom: none; }
+  .corretor-result-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .corretor-result-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .resultado-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .res-kpi {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+  }
+  .res-kpi .rl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+  .res-kpi .rv { font-size: 18px; font-weight: 700; color: var(--purple); }
+  .res-kpi.destaque .rv { color: var(--gold); font-size: 22px; }
+  .result-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .result-table thead { background: #f0eaf8; }
+  .result-table thead th { padding: 8px 12px; text-align: left; color: var(--purple); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .result-table tbody tr { border-bottom: 1px solid #f5f1fc; }
+  .result-table tbody tr:hover { background: #faf8fd; }
+  .result-table tbody td { padding: 8px 12px; color: var(--text); }
+  .result-table tbody td.val { font-weight: 700; color: var(--purple); }
+  .result-table tbody td.comis { font-weight: 700; color: var(--gold); }
+  .sem-dados {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .btn-apurar {
+    background: linear-gradient(90deg, var(--purple), #7B3A6E);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.18s;
+    margin-bottom: 20px;
+  }
+  .btn-apurar:hover { opacity: 0.88; }
+  .btn-export-apuracao {
+    background: var(--gold);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.18s;
+  }
+  .btn-export-apuracao:hover { background: var(--gold-light); }
+
   @media (max-width: 680px) {
     header { padding: 14px 16px; }
     .upload-section, .dashboard { padding: 0 12px; }
@@ -329,6 +569,13 @@
   <div class="header-date" id="headerDate"></div>
 </header>
 
+
+<!-- TABS NAV -->
+<div class="tabs-nav" id="tabsNav" style="display:none">
+  <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+  <button class="tab-btn" onclick="switchTab('apuracao')">💰 Apuração de Comissão</button>
+</div>
+
 <!-- UPLOAD -->
 <div class="upload-section">
   <div class="upload-box" id="uploadBox">
@@ -342,6 +589,7 @@
   </div>
 </div>
 
+<div class="tab-panel active" id="tabDashboard">
 <!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
 
@@ -436,6 +684,65 @@
   </div>
 
 </div>
+</div><!-- /tabDashboard -->
+
+<!-- APURAÇÃO SECTION -->
+<div class="tab-panel" id="tabApuracao">
+<div class="apuracao-section">
+
+  <div class="apuracao-notice">
+    ℹ️ Cadastre os corretores com suas regras de comissão. A apuração filtra automaticamente os registros do arquivo carregado conforme cada regra.
+  </div>
+
+  <!-- FORMULÁRIO CADASTRO CORRETOR -->
+  <div class="corretor-form">
+    <h3>➕ Cadastrar / Editar Corretor</h3>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Código + Nome do Corretor</label>
+        <input type="text" id="fCodNome" placeholder="Ex: 215733 - CAUÃ ALVES DE SOUSA FRANÇA">
+        <small>Digite o código e nome exatamente como aparece no arquivo</small>
+      </div>
+      <div class="form-group">
+        <label>Percentual de Comissão (%)</label>
+        <input type="number" id="fPerc" placeholder="Ex: 1" min="0" max="100" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Data de Assinatura a partir de (opcional)</label>
+        <input type="date" id="fDataFrom" placeholder="01/06/2026">
+        <small>Deixe em branco para considerar todas as datas</small>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Grades Permitidas (uma por linha)</label>
+        <textarea id="fGrades" placeholder="COMPLETO JUNIOR&#10;COMPLETO PLENO&#10;COMPLETO SÊNIOR&#10;COMPLETO GOLD"></textarea>
+        <small>Cole cada grade em uma linha separada. Deixe em branco para aceitar todas as grades.</small>
+      </div>
+    </div>
+    <button class="btn-add-corretor" onclick="salvarCorretor()">💾 Salvar Corretor</button>
+    <span id="fEditId" style="display:none"></span>
+  </div>
+
+  <!-- LISTA CORRETORES CADASTRADOS -->
+  <div class="corretores-lista">
+    <div class="corretores-lista-header">
+      <span>👥 Corretores Cadastrados</span>
+      <span id="corretoresCount" style="font-size:12px;font-weight:400;opacity:0.8">0 corretores</span>
+    </div>
+    <div id="corretoresLista">
+      <div class="sem-dados">Nenhum corretor cadastrado ainda.</div>
+    </div>
+  </div>
+
+  <!-- BOTÃO APURAR -->
+  <button class="btn-apurar" onclick="executarApuracao()">
+    🔍 Executar Apuração
+  </button>
+
+  <!-- RESULTADO -->
+  <div id="apuracaoResultado"></div>
+
+</div>
+</div>
 
 <script>
 // ─── STATE ───────────────────────────────────────────────────────────────────
@@ -449,6 +756,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
   document.getElementById('headerDate').textContent =
     now.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  loadCorretores();
+  renderCorretoresList();
   setupUpload();
 });
 
@@ -506,6 +815,8 @@ function processFile(file) {
       document.getElementById('uploadSub').textContent = `${rows.length.toLocaleString('pt-BR')} registros carregados · Clique para trocar o arquivo`;
 
       buildDashboard();
+      document.getElementById('tabsNav').style.display = 'flex';
+      executarApuracao();
 
     } catch(err) {
       alert('Erro ao processar arquivo: ' + err.message);
@@ -1022,6 +1333,476 @@ function exportarPDF() {
   const dataNome = dataBaixa.replace(/\//g, '-');
   doc.save(`Resumo_Baixas_${dataNome}.pdf`);
 }
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(tab === 'dashboard' ? 'dashboard' : 'apuração'))
+      b.classList.add('active');
+  });
+  if (tab === 'apuracao') renderCorretoresList();
+}
+
+// ─── APURAÇÃO: STATE & STORAGE ────────────────────────────────────────────────
+let corretores = [];
+
+function loadCorretores() {
+  try {
+    const stored = localStorage.getItem('affinity_corretores');
+    corretores = stored ? JSON.parse(stored) : [];
+  } catch(e) { corretores = []; }
+}
+
+function saveCorretores() {
+  try { localStorage.setItem('affinity_corretores', JSON.stringify(corretores)); } catch(e) {}
+}
+
+function salvarCorretor() {
+  const codNome = document.getElementById('fCodNome').value.trim();
+  const perc = parseFloat(document.getElementById('fPerc').value);
+  const dataFrom = document.getElementById('fDataFrom').value; // yyyy-mm-dd
+  const gradesRaw = document.getElementById('fGrades').value.trim();
+  const editIdEl = document.getElementById('fEditId');
+
+  if (!codNome) { alert('Informe o código + nome do corretor.'); return; }
+  if (isNaN(perc) || perc <= 0) { alert('Informe um percentual válido (maior que 0).'); return; }
+
+  const grades = gradesRaw
+    ? gradesRaw.split('\n').map(g => g.trim().toUpperCase()).filter(Boolean)
+    : [];
+
+  const obj = {
+    id: editIdEl.textContent || Date.now().toString(),
+    codNome,
+    perc,
+    dataFrom: dataFrom || '',
+    grades
+  };
+
+  const existingIdx = corretores.findIndex(c => c.id === obj.id);
+  if (existingIdx >= 0) corretores[existingIdx] = obj;
+  else corretores.push(obj);
+
+  saveCorretores();
+
+  // Reset form
+  document.getElementById('fCodNome').value = '';
+  document.getElementById('fPerc').value = '';
+  document.getElementById('fDataFrom').value = '';
+  document.getElementById('fGrades').value = '';
+  editIdEl.textContent = '';
+
+  renderCorretoresList();
+}
+
+function editarCorretor(id) {
+  const c = corretores.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('fCodNome').value = c.codNome;
+  document.getElementById('fPerc').value = c.perc;
+  document.getElementById('fDataFrom').value = c.dataFrom || '';
+  document.getElementById('fGrades').value = c.grades.join('\n');
+  document.getElementById('fEditId').textContent = c.id;
+  document.querySelector('.corretor-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function deletarCorretor(id) {
+  if (!confirm('Remover este corretor?')) return;
+  corretores = corretores.filter(c => c.id !== id);
+  saveCorretores();
+  renderCorretoresList();
+}
+
+function renderCorretoresList() {
+  const container = document.getElementById('corretoresLista');
+  document.getElementById('corretoresCount').textContent = corretores.length + ' corretor(es)';
+
+  if (corretores.length === 0) {
+    container.innerHTML = '<div class="sem-dados">Nenhum corretor cadastrado ainda.</div>';
+    return;
+  }
+
+  container.innerHTML = corretores.map(c => {
+    const dateLabel = c.dataFrom
+      ? new Date(c.dataFrom + 'T00:00:00').toLocaleDateString('pt-BR')
+      : 'Todas as datas';
+    const gradesLabel = c.grades.length > 0
+      ? c.grades.map(g => `<span>${g}</span>`).join(' ')
+      : '<span>Todas as grades</span>';
+    return `
+      <div class="corretor-item">
+        <div class="corretor-info">
+          <div class="corretor-nome">${c.codNome}</div>
+          <div class="corretor-rules">
+            Comissão: <strong>${c.perc}%</strong> &nbsp;·&nbsp;
+            Parcela: <strong>2ª</strong> &nbsp;·&nbsp;
+            Data a partir de: <strong>${dateLabel}</strong><br>
+            Grades: ${gradesLabel}
+          </div>
+        </div>
+        <button class="btn-del-corretor" onclick="deletarCorretor('${c.id}')">🗑 Remover</button>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── APURAÇÃO: EXECUÇÃO ────────────────────────────────────────────────────────
+function parseDateBR(str) {
+  // Aceita dd/mm/yyyy
+  if (!str) return null;
+  const parts = str.split('/');
+  if (parts.length === 3) return new Date(+parts[2], +parts[1]-1, +parts[0]);
+  return null;
+}
+
+function executarApuracao() {
+  if (allRows.length === 0) {
+    alert('Carregue o arquivo XML primeiro antes de executar a apuração.');
+    return;
+  }
+  if (corretores.length === 0) {
+    alert('Cadastre pelo menos um corretor antes de apurar.');
+    return;
+  }
+
+  const resultados = corretores.map(c => {
+    // Extrair código do corretor (parte antes do " - " ou string inteira)
+    const codMatch = c.codNome.match(/^(\d+)/);
+    const cod = codMatch ? codMatch[1] : null;
+
+    // dataFrom como objeto Date (comparação dia a dia)
+    let dataFromDate = null;
+    if (c.dataFrom) {
+      dataFromDate = new Date(c.dataFrom + 'T00:00:00');
+    }
+
+    const matchedRows = allRows.filter(r => {
+      // 1. Parcela = 2
+      const parcela = parseInt(r['Parcela']);
+      if (parcela !== 2) return false;
+
+      // 2. Grade Corretor
+      if (c.grades.length > 0) {
+        const gradeRow = String(r['Grade Corretor'] || '').toUpperCase().trim();
+        if (!c.grades.includes(gradeRow)) return false;
+      }
+
+      // 3. Data de assinatura
+      if (dataFromDate) {
+        const assinRow = parseDateBR(String(r['Assinatura'] || ''));
+        if (!assinRow || assinRow < dataFromDate) return false;
+      }
+
+      return true;
+    });
+
+    const baseTotal = matchedRows.reduce((s, r) => s + (parseFloat(r['Vl Total']) || 0), 0);
+    const comissao = baseTotal * (c.perc / 100);
+
+    return { corretor: c, matchedRows, baseTotal, comissao };
+  });
+
+  renderApuracaoResultado(resultados);
+}
+
+function renderApuracaoResultado(resultados) {
+  const container = document.getElementById('apuracaoResultado');
+
+  if (resultados.length === 0) {
+    container.innerHTML = '<div class="sem-dados">Nenhum resultado para exibir.</div>';
+    return;
+  }
+
+  let html = `
+    <div class="apuracao-resultado">
+      <div class="apuracao-resultado-header">
+        📋 Resultado da Apuração
+        <button class="btn-export-apuracao" onclick="exportarApuracaoExcel()">⬇ Exportar Excel</button>
+      </div>
+  `;
+
+  resultados.forEach(res => {
+    const dateLabel = res.corretor.dataFrom
+      ? new Date(res.corretor.dataFrom + 'T00:00:00').toLocaleDateString('pt-BR')
+      : 'Todas';
+
+    html += `
+      <div class="corretor-result-block">
+        <div class="corretor-result-title">
+          <span>${res.corretor.codNome}</span>
+          <span style="font-size:13px;color:var(--muted);font-weight:500">${res.corretor.perc}% comissão</span>
+        </div>
+        <div class="corretor-result-sub">
+          Parcela 2ª &nbsp;·&nbsp; Data a partir de: ${dateLabel} &nbsp;·&nbsp;
+          Grades: ${res.corretor.grades.length > 0 ? res.corretor.grades.join(', ') : 'Todas'}
+        </div>
+        <div class="resultado-kpis">
+          <div class="res-kpi">
+            <div class="rl">Registros Encontrados</div>
+            <div class="rv">${res.matchedRows.length.toLocaleString('pt-BR')}</div>
+          </div>
+          <div class="res-kpi">
+            <div class="rl">Base de Cálculo</div>
+            <div class="rv">${fmt(res.baseTotal)}</div>
+          </div>
+          <div class="res-kpi destaque">
+            <div class="rl">💰 Comissão a Pagar (${res.corretor.perc}%)</div>
+            <div class="rv">${fmt(res.comissao)}</div>
+          </div>
+        </div>
+    `;
+
+    if (res.matchedRows.length > 0) {
+      html += `
+        <div style="overflow-x:auto">
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>Data Baixa</th>
+                <th>Assinatura</th>
+                <th>Grade Corretor</th>
+                <th>Operadora</th>
+                <th>Parcela</th>
+                <th>Vl Total</th>
+                <th>Comissão (${res.corretor.perc}%)</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      res.matchedRows.forEach(r => {
+        const vl = parseFloat(r['Vl Total']) || 0;
+        const com = vl * (res.corretor.perc / 100);
+        html += `
+          <tr>
+            <td>${r['Baixa'] || '—'}</td>
+            <td>${r['Assinatura'] || '—'}</td>
+            <td>${r['Grade Corretor'] || '—'}</td>
+            <td>${r['Operadora'] || '—'}</td>
+            <td style="text-align:center">${r['Parcela'] ?? '—'}</td>
+            <td class="val">${fmt(vl)}</td>
+            <td class="comis">${fmt(com)}</td>
+          </tr>`;
+      });
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    } else {
+      html += `<div style="font-size:13px;color:var(--muted);padding:12px 0">Nenhum registro encontrado para este corretor com as regras configuradas.</div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  // Store for export
+  window._lastApuracaoResult = resultados;
+}
+
+// ─── EXPORT APURAÇÃO EXCEL ────────────────────────────────────────────────────
+async function exportarApuracaoExcel() {
+  const resultados = window._lastApuracaoResult;
+  if (!resultados || resultados.length === 0) return;
+
+  const PURPLE    = '7B3A6E';
+  const PURPLE_DK = '5C2952';
+  const GOLD      = 'C9A84C';
+  const GOLD_LIGHT = 'F5EDD8';
+  const WHITE     = 'FFFFFF';
+  const ALT_ROW   = 'F0E8F5';
+  const TEXT_DARK = '2B1A38';
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Affinity Corretora';
+  wb.created = new Date();
+
+  const F = (extra = {}) => ({ name: 'Arial', size: 11, ...extra });
+
+  // ── Aba Resumo
+  const wsR = wb.addWorksheet('Resumo Apuração', {
+    views: [{ showGridLines: false }],
+    pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true }
+  });
+  wsR.columns = [
+    { key: 'corretor', width: 50 },
+    { key: 'qtd', width: 14 },
+    { key: 'base', width: 24 },
+    { key: 'perc', width: 14 },
+    { key: 'comissao', width: 24 }
+  ];
+
+  // Título
+  wsR.mergeCells('A1:E1');
+  const t1 = wsR.getCell('A1');
+  t1.value = 'Affinity Corretora — Apuração de Comissão';
+  t1.font = F({ size: 14, bold: true, color: { argb: WHITE } });
+  t1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE_DK } };
+  t1.alignment = { vertical: 'middle', horizontal: 'center' };
+  wsR.getRow(1).height = 36;
+
+  wsR.mergeCells('A2:E2');
+  const t2 = wsR.getCell('A2');
+  t2.value = `Gerado em: ${new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'})}`;
+  t2.font = F({ size: 11, italic: true, color: { argb: PURPLE_DK } });
+  t2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GOLD_LIGHT } };
+  t2.alignment = { vertical: 'middle', horizontal: 'center' };
+  wsR.getRow(2).height = 22;
+
+  wsR.getRow(3).height = 6;
+
+  // Cabeçalho tabela
+  const hdrs = ['Corretor', 'Registros', 'Base de Cálculo', '% Comissão', 'Comissão a Pagar'];
+  hdrs.forEach((h, i) => {
+    const col = String.fromCharCode(65 + i);
+    const cell = wsR.getCell(`${col}4`);
+    cell.value = h;
+    cell.font = F({ bold: true, color: { argb: WHITE } });
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE } };
+    cell.alignment = { vertical: 'middle', horizontal: i >= 1 ? 'right' : 'left', indent: i === 0 ? 1 : 0 };
+    cell.border = { bottom: { style: 'medium', color: { argb: GOLD } } };
+  });
+  wsR.getRow(4).height = 24;
+
+  let totalBase = 0, totalComissao = 0;
+  resultados.forEach((res, idx) => {
+    const r = 5 + idx;
+    const bg = idx % 2 === 1 ? ALT_ROW : WHITE;
+    wsR.getRow(r).height = 22;
+    totalBase += res.baseTotal;
+    totalComissao += res.comissao;
+
+    const vals = [res.corretor.codNome, res.matchedRows.length, res.baseTotal, res.corretor.perc / 100, res.comissao];
+    vals.forEach((v, i) => {
+      const col = String.fromCharCode(65 + i);
+      const cell = wsR.getCell(`${col}${r}`);
+      cell.value = v;
+      cell.font = F({ color: { argb: i === 4 ? GOLD : TEXT_DARK }, bold: i === 4 });
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+      cell.alignment = { vertical: 'middle', horizontal: i >= 1 ? 'right' : 'left', indent: i === 0 ? 1 : 0 };
+      cell.border = {};
+      if (i === 2 || i === 4) cell.numFmt = 'R$ #,##0.00';
+      if (i === 3) cell.numFmt = '0.00%';
+    });
+  });
+
+  // Total
+  const rTotal = 5 + resultados.length;
+  wsR.getRow(rTotal).height = 26;
+  [['TOTAL GERAL', null, totalBase, null, totalComissao]].forEach((vals) => {
+    vals.forEach((v, i) => {
+      const col = String.fromCharCode(65 + i);
+      const cell = wsR.getCell(`${col}${rTotal}`);
+      cell.value = v ?? '';
+      cell.font = F({ bold: true, color: { argb: i === 4 ? GOLD : GOLD_LIGHT } });
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE_DK } };
+      cell.alignment = { vertical: 'middle', horizontal: i >= 1 ? 'right' : 'left', indent: i === 0 ? 1 : 0 };
+      cell.border = { top: { style: 'medium', color: { argb: GOLD } } };
+      if (i === 2 || i === 4) cell.numFmt = 'R$ #,##0.00';
+    });
+  });
+
+  // ── Aba por corretor
+  resultados.forEach(res => {
+    const sheetName = res.corretor.codNome.substring(0, 28).replace(/[\\\/:*?[\]]/g, '_');
+    const ws = wb.addWorksheet(sheetName, {
+      views: [{ showGridLines: false }],
+      pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true }
+    });
+    ws.columns = [
+      { key: 'baixa', width: 16 },
+      { key: 'assin', width: 16 },
+      { key: 'grade', width: 34 },
+      { key: 'operadora', width: 30 },
+      { key: 'parcela', width: 12 },
+      { key: 'vltotal', width: 22 },
+      { key: 'comissao', width: 22 }
+    ];
+
+    // Título
+    ws.mergeCells('A1:G1');
+    const ct = ws.getCell('A1');
+    ct.value = res.corretor.codNome;
+    ct.font = F({ size: 13, bold: true, color: { argb: WHITE } });
+    ct.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE_DK } };
+    ct.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+    ws.getRow(1).height = 30;
+
+    ws.mergeCells('A2:G2');
+    const cs = ws.getCell('A2');
+    const dateLabel = res.corretor.dataFrom
+      ? new Date(res.corretor.dataFrom + 'T00:00:00').toLocaleDateString('pt-BR')
+      : 'Todas';
+    cs.value = `Comissão: ${res.corretor.perc}%  ·  Parcela: 2ª  ·  Data a partir de: ${dateLabel}  ·  Grades: ${res.corretor.grades.length > 0 ? res.corretor.grades.join(', ') : 'Todas'}`;
+    cs.font = F({ size: 10, italic: true, color: { argb: PURPLE_DK } });
+    cs.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GOLD_LIGHT } };
+    cs.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+    ws.getRow(2).height = 20;
+
+    ws.getRow(3).height = 6;
+
+    const cols = ['Data Baixa', 'Assinatura', 'Grade Corretor', 'Operadora', 'Parcela', 'Vl Total', `Comissão (${res.corretor.perc}%)`];
+    cols.forEach((h, i) => {
+      const col = String.fromCharCode(65 + i);
+      const cell = ws.getCell(`${col}4`);
+      cell.value = h;
+      cell.font = F({ bold: true, color: { argb: WHITE } });
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE } };
+      cell.alignment = { vertical: 'middle', horizontal: i >= 4 ? 'right' : 'left', indent: i <= 3 ? 1 : 0 };
+      cell.border = { bottom: { style: 'medium', color: { argb: GOLD } } };
+    });
+    ws.getRow(4).height = 22;
+
+    res.matchedRows.forEach((r, idx) => {
+      const rn = 5 + idx;
+      const bg = idx % 2 === 1 ? ALT_ROW : WHITE;
+      const vl = parseFloat(r['Vl Total']) || 0;
+      const com = vl * (res.corretor.perc / 100);
+      const rowVals = [r['Baixa']||'', r['Assinatura']||'', r['Grade Corretor']||'', r['Operadora']||'', parseInt(r['Parcela'])||'', vl, com];
+      ws.getRow(rn).height = 20;
+      rowVals.forEach((v, i) => {
+        const col = String.fromCharCode(65 + i);
+        const cell = ws.getCell(`${col}${rn}`);
+        cell.value = v;
+        cell.font = F({ color: { argb: i === 6 ? GOLD : TEXT_DARK }, bold: i === 6 });
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+        cell.alignment = { vertical: 'middle', horizontal: i >= 4 ? 'right' : 'left', indent: i <= 3 ? 1 : 0 };
+        cell.border = {};
+        if (i === 5 || i === 6) cell.numFmt = 'R$ #,##0.00';
+      });
+    });
+
+    // Linha totais na aba
+    const rTot = 5 + res.matchedRows.length;
+    ws.getRow(rTot).height = 24;
+    const totVals = ['', '', '', 'TOTAL', '', res.baseTotal, res.comissao];
+    totVals.forEach((v, i) => {
+      const col = String.fromCharCode(65 + i);
+      const cell = ws.getCell(`${col}${rTot}`);
+      cell.value = v;
+      cell.font = F({ bold: true, color: { argb: i === 6 ? GOLD : GOLD_LIGHT } });
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PURPLE_DK } };
+      cell.alignment = { vertical: 'middle', horizontal: i >= 4 ? 'right' : 'left', indent: i <= 3 ? 1 : 0 };
+      cell.border = { top: { style: 'medium', color: { argb: GOLD } } };
+      if (i === 5 || i === 6) cell.numFmt = 'R$ #,##0.00';
+    });
+  });
+
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Apuracao_Comissao_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 </script>
 </body>
 </html>
