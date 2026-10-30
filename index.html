@@ -406,6 +406,52 @@
   }
   .btn-add-corretor:hover { background: var(--purple-light); }
 
+
+  /* DESCRIÇÃO COBRANÇA */
+  .descricao-cobranca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f0eaf8;
+    border: 1.5px solid var(--purple);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+  }
+  .descricao-cobranca .desc-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+  .descricao-cobranca .desc-text {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--purple);
+    letter-spacing: 0.2px;
+    word-break: break-all;
+  }
+  .btn-copy-desc {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .btn-copy-desc:hover { background: var(--purple-light); }
+  .btn-copy-desc.copied { background: var(--sim); }
+
   /* LISTA DE CORRETORES CADASTRADOS */
   .corretores-lista {
     background: var(--card);
@@ -1529,6 +1575,23 @@ function renderApuracaoResultado(resultados) {
       ? new Date(res.corretor.dataFrom + 'T00:00:00').toLocaleDateString('pt-BR')
       : 'Todas';
 
+    // Calcular período das baixas dos registros encontrados
+    let periodoLabel = '';
+    if (res.matchedRows.length > 0) {
+      const datas = res.matchedRows
+        .map(r => parseDateBR(String(r['Baixa'] || '')))
+        .filter(Boolean)
+        .map(d => d.getTime());
+      if (datas.length > 0) {
+        const dMin = new Date(Math.min(...datas));
+        const dMax = new Date(Math.max(...datas));
+        const fmtD = d => d.toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric'});
+        periodoLabel = `${fmtD(dMin)} a ${fmtD(dMax)}`;
+      }
+    }
+    const descCobranca = `REF. COMISSÃO [${res.corretor.perc}%] - PER. ${periodoLabel || '—'}`;
+    const descId = 'desc_' + res.corretor.id;
+
     html += `
       <div class="corretor-result-block">
         <div class="corretor-result-title">
@@ -1538,6 +1601,13 @@ function renderApuracaoResultado(resultados) {
         <div class="corretor-result-sub">
           Parcela 2ª &nbsp;·&nbsp; Data a partir de: ${dateLabel} &nbsp;·&nbsp;
           Grades: ${res.corretor.grades.length > 0 ? res.corretor.grades.join(', ') : 'Todas'}
+        </div>
+        <div class="descricao-cobranca">
+          <span class="desc-label">📋 Descrição</span>
+          <span class="desc-text" id="${descId}">${descCobranca}</span>
+          <button class="btn-copy-desc" id="btn_${descId}" onclick="copiarDescricao('${descId}', 'btn_${descId}')">
+            📋 Copiar
+          </button>
         </div>
         <div class="resultado-kpis">
           <div class="res-kpi">
@@ -1801,6 +1871,36 @@ async function exportarApuracaoExcel() {
   a.download = `Apuracao_Comissao_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.xlsx`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ─── COPIAR DESCRIÇÃO ─────────────────────────────────────────────────────────
+function copiarDescricao(textId, btnId) {
+  const text = document.getElementById(textId)?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.textContent = '✓ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '📋 Copiar';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Fallback para navegadores sem clipboard API
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed'; el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.textContent = '✓ Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.innerHTML = '📋 Copiar'; btn.classList.remove('copied'); }, 2000);
+    }
+  });
 }
 
 </script>
